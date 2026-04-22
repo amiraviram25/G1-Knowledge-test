@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ontario G1 Question Bank</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red:#C8102E; --gold:#FFB81C; --navy:#0D1B2A; --slate:#1C2E40;
+    --muted:#3A5068; --white:#FFFFFF; --green:#1A7F4B; --orange:#E05C1B; --card:#162132;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--white);min-height:100vh}
+
+  header{background:linear-gradient(135deg,var(--red) 0%,#8B0000 100%);padding:28px 32px 24px;position:relative;overflow:hidden}
+  header::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:rgba(255,255,255,0.07);border-radius:50%}
+  header::after{content:'';position:absolute;bottom:-80px;left:30%;width:260px;height:260px;background:rgba(255,255,255,0.04);border-radius:50%}
+  .hbadge{display:inline-block;background:var(--gold);color:var(--navy);font-family:'Syne',sans-serif;font-weight:800;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;border-radius:3px;margin-bottom:10px}
+  header h1{font-family:'Syne',sans-serif;font-size:clamp(22px,5vw,36px);font-weight:800;line-height:1.15;position:relative;z-index:1}
+  header p{font-size:14px;opacity:.85;margin-top:6px;font-weight:300;position:relative;z-index:1}
+
+  .tab-bar{display:flex;background:var(--slate);overflow-x:auto;border-bottom:2px solid rgba(255,255,255,0.06);scrollbar-width:none}
+  .tab-bar::-webkit-scrollbar{display:none}
+  .tab-btn{flex-shrink:0;padding:14px 20px;background:none;border:none;color:rgba(255,255,255,0.45);font-family:'Syne',sans-serif;font-weight:600;font-size:12px;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap}
+  .tab-btn:hover{color:var(--white)}
+  .tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+
+  .container{padding:24px 20px;max-width:860px;margin:0 auto}
+  .section{display:none}
+  .section.active{display:block}
+
+  .sec-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--gold);margin-bottom:6px;display:flex;align-items:center;gap:10px}
+  .sec-desc{font-size:13px;color:rgba(255,255,255,0.55);margin-bottom:20px;font-weight:300}
+
+  .cat-hdr{background:linear-gradient(90deg,rgba(200,16,46,0.15),transparent);border-left:4px solid var(--red);padding:10px 16px;margin:28px 0 14px;border-radius:0 8px 8px 0}
+  .cat-hdr h3{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--white)}
+  .cat-hdr span{font-size:11px;color:rgba(255,255,255,0.45);font-weight:300}
+
+  .search-wrap{position:relative;margin-bottom:18px}
+  .search-input{width:100%;background:var(--card);border:1.5px solid rgba(255,255,255,0.1);border-radius:9px;padding:12px 16px 12px 42px;color:white;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+  .search-input:focus{border-color:var(--gold)}
+  .search-input::placeholder{color:rgba(255,255,255,0.3)}
+  .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.3);font-size:16px}
+
+  .prog-wrap{background:var(--card);border:1px solid rgba(255,255,255,0.07);border-radius:9px;padding:14px 16px;margin-bottom:18px;display:flex;align-items:center;gap:14px}
+  .prog-track{flex:1;height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden}
+  .prog-fill{height:100%;background:var(--gold);border-radius:3px;transition:width .4s ease}
+  .prog-text{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,0.5);white-space:nowrap}
+
+  /* MC CARD */
+  .mc-card{background:var(--card);border:1px solid rgba(255,255,255,0.07);border-radius:12px;margin-bottom:14px;overflow:hidden;transition:border-color .25s}
+  .mc-card.ans-ok{border-color:rgba(26,127,75,0.5)}
+  .mc-card.ans-no{border-color:rgba(200,16,46,0.4)}
+  .mc-hdr{padding:16px 18px 14px;display:flex;gap:12px;align-items:flex-start}
+  .mc-num{background:rgba(200,16,46,0.25);color:var(--red);font-family:'Syne',sans-serif;font-weight:700;font-size:11px;padding:3px 7px;border-radius:4px;flex-shrink:0;margin-top:2px;min-width:28px;text-align:center}
+  .mc-num.ok{background:rgba(26,127,75,0.3);color:#4CAF50}
+  .mc-num.no{background:rgba(200,16,46,0.3);color:#FF6B6B}
+  .mc-q{font-size:14px;font-weight:500;line-height:1.55;flex:1}
+  .mc-opts{padding:0 18px 6px;display:flex;flex-direction:column;gap:8px}
+  .mc-opt{background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);border-radius:8px;padding:11px 14px;cursor:pointer;font-size:13.5px;text-align:left;color:rgba(255,255,255,0.8);transition:all .18s;display:flex;align-items:center;gap:10px;width:100%;font-family:'DM Sans',sans-serif}
+  .mc-opt:hover:not(:disabled){border-color:var(--gold);color:white;background:rgba(255,184,28,0.07)}
+  .mc-opt.opt-ok{border-color:#2ecc71;background:rgba(26,127,75,0.18);color:white;cursor:default}
+  .mc-opt.opt-no{border-color:var(--red);background:rgba(200,16,46,0.13);color:rgba(255,255,255,0.5);cursor:default}
+  .mc-opt.opt-reveal{border-color:#2ecc71;background:rgba(26,127,75,0.08);color:rgba(255,255,255,0.7);cursor:default}
+  .mc-opt:disabled{cursor:default}
+  .opt-ltr{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;flex-shrink:0}
+  .opt-ok .opt-ltr{background:rgba(26,127,75,0.4)}
+  .opt-no .opt-ltr{background:rgba(200,16,46,0.3)}
+  .opt-reveal .opt-ltr{background:rgba(26,127,75,0.2)}
+  .opt-icon{margin-left:auto;font-size:14px;flex-shrink:0}
+  .mc-fb{margin:0 18px 14px;padding:11px 14px;border-radius:8px;font-size:13px;line-height:1.6;display:none}
+  .mc-fb.show{display:block}
+  .mc-fb.fb-ok{background:rgba(26,127,75,0.18);border:1px solid rgba(26,127,75,0.3)}
+  .mc-fb.fb-no{background:rgba(200,16,46,0.14);border:1px solid rgba(200,16,46,0.28)}
+  .mc-tip{display:none;margin:0 18px 14px;font-size:12px;color:var(--gold);background:rgba(255,184,28,0.1);border-left:3px solid var(--gold);padding:7px 10px;border-radius:0 5px 5px 0}
+  .mc-tip.show{display:block}
+
+  .divider{height:1px;background:rgba(255,255,255,0.06);margin:28px 0}
+
+  /* MEMORY */
+  .mem-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:20px}
+  .mem-card{background:var(--card);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:16px;position:relative;overflow:hidden}
+  .mem-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+  .p2::before{background:#4CAF50}.p3::before{background:var(--gold)}.p4::before{background:var(--orange)}.p6::before{background:var(--red)}.p7::before{background:#8B0000}
+  .mem-pts{font-family:'Syne',sans-serif;font-size:38px;font-weight:800;line-height:1;margin-bottom:4px}
+  .p2 .mem-pts{color:#4CAF50}.p3 .mem-pts{color:var(--gold)}.p4 .mem-pts{color:var(--orange)}.p6 .mem-pts{color:#FF6B6B}.p7 .mem-pts{color:#FF4444}
+  .mem-pts-lbl{font-size:10px;text-transform:uppercase;letter-spacing:1px;opacity:.5;margin-bottom:12px;font-family:'Syne',sans-serif}
+  .mem-list{list-style:none}
+  .mem-list li{font-size:12.5px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05);color:rgba(255,255,255,0.8);display:flex;align-items:flex-start;gap:6px;line-height:1.4}
+  .mem-list li:last-child{border-bottom:none}
+  .mem-list li::before{content:'→';font-size:11px;opacity:.4;margin-top:1px;flex-shrink:0}
+  .mtrick{background:rgba(255,184,28,0.08);border:1px solid rgba(255,184,28,0.2);border-radius:8px;padding:14px 16px;margin:10px 0}
+  .mtrick-lbl{font-family:'Syne',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+  .mtrick p{font-size:13px;line-height:1.6;color:rgba(255,255,255,0.8)}
+  .mtrick strong{color:var(--gold)}
+
+  /* SUSPEND */
+  .sus-card{border-radius:10px;overflow:hidden;margin-bottom:14px;border:1px solid rgba(255,255,255,0.07)}
+  .sus-hdr{padding:12px 16px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;letter-spacing:.5px}
+  .sus-hdr.full{background:rgba(76,175,80,0.15);color:#4CAF50;border-bottom:1px solid rgba(76,175,80,0.2)}
+  .sus-hdr.nov{background:rgba(224,92,27,0.15);color:var(--orange);border-bottom:1px solid rgba(224,92,27,0.2)}
+  .sus-row{display:flex;align-items:center;padding:10px 16px;background:var(--card);border-bottom:1px solid rgba(255,255,255,0.05);gap:14px}
+  .sus-row:last-child{border-bottom:none}
+  .sus-pts{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;min-width:70px}
+  .sus-desc{font-size:13px;color:rgba(255,255,255,0.75);line-height:1.5}
+
+  /* QUIZ */
+  .qz-setup{text-align:center;padding:30px 20px}
+  .qz-setup h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:8px}
+  .qz-setup p{font-size:14px;color:rgba(255,255,255,0.55);margin-bottom:24px}
+  .qz-btn{display:inline-block;background:var(--red);color:white;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;padding:13px 32px;border:none;border-radius:8px;cursor:pointer;letter-spacing:.5px;transition:background .2s,transform .1s;margin:6px}
+  .qz-btn:hover{background:#A00D24}
+  .qz-btn:active{transform:scale(.98)}
+  .qz-btn.sec{background:var(--slate);color:rgba(255,255,255,0.7)}
+  .qz-btn.sec:hover{background:var(--muted)}
+  .qz-cont{display:none}
+  .qz-prog-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+  .qz-prog-bar{flex:1;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;margin:0 12px;overflow:hidden}
+  .qz-prog-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .4s ease}
+  .qz-qnum{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,0.4)}
+  .qz-score{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--gold)}
+  .qz-qbox{background:var(--card);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;margin-bottom:16px}
+  .qz-qcat{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);font-family:'Syne',sans-serif;font-weight:700;margin-bottom:8px}
+  .qz-qtext{font-size:15px;font-weight:500;line-height:1.6}
+  .qz-opts{display:flex;flex-direction:column;gap:10px}
+  .qz-opt{background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);border-radius:9px;padding:13px 16px;cursor:pointer;font-size:14px;text-align:left;color:rgba(255,255,255,0.8);transition:all .18s;display:flex;align-items:center;gap:10px;font-family:'DM Sans',sans-serif}
+  .qz-opt:hover:not(:disabled){border-color:var(--gold);color:white;background:rgba(255,184,28,0.06)}
+  .qz-opt.cor{border-color:var(--green);background:rgba(26,127,75,0.15);color:white}
+  .qz-opt.wrg{border-color:var(--red);background:rgba(200,16,46,0.12);color:rgba(255,255,255,0.6)}
+  .qz-opt:disabled{cursor:default}
+  .qz-oltr{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;flex-shrink:0}
+  .qz-fb{padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:14px;display:none;line-height:1.55}
+  .qz-fb.show{display:block}
+  .qz-fb.cor-fb{background:rgba(26,127,75,0.2);border:1px solid rgba(26,127,75,0.3)}
+  .qz-fb.wrg-fb{background:rgba(200,16,46,0.15);border:1px solid rgba(200,16,46,0.25)}
+  .qz-next{width:100%;display:none;background:var(--slate);border:1px solid rgba(255,255,255,0.15);color:white;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;padding:13px;border-radius:9px;cursor:pointer;letter-spacing:.5px;transition:background .2s}
+  .qz-next.show{display:block}
+  .qz-next:hover{background:var(--muted)}
+  .qz-result{text-align:center;padding:30px 20px;display:none}
+  .qz-result h2{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:6px}
+  .score-big{font-family:'Syne',sans-serif;font-size:64px;font-weight:800;line-height:1;margin:14px 0}
+  .qz-result p{font-size:14px;color:rgba(255,255,255,0.55);margin-bottom:20px}
+  .pass-c{color:var(--green)}.fail-c{color:var(--red)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hbadge">Ontario MTO — Updated 2025–2026</div>
+  <h1>G1 Knowledge Test<br>Question Bank</h1>
+  <p>Full road rules · Demerit points · Fines · Memory system · Practice quiz</p>
+</header>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="showTab('qa',this)">📋 Q&amp;A Bank</button>
+  <button class="tab-btn" onclick="showTab('demerits',this)">⚠️ Demerits &amp; Fines</button>
+  <button class="tab-btn" onclick="showTab('memory',this)">🧠 Memory System</button>
+  <button class="tab-btn" onclick="showTab('quiz',this)">🎯 Quiz Mode</button>
+</div>
+
+<!-- TAB 1: Q&A BANK -->
+<div id="tab-qa" class="section active">
+<div class="container">
+  <div class="sec-title">📋 Complete Question Bank</div>
+  <p class="sec-desc">Click any answer option to check it — the correct answer is revealed instantly with a full explanation.</p>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" type="text" id="qaSearch" placeholder="Search questions…" oninput="filterCards(this.value,'qa-list')">
+  </div>
+  <div class="prog-wrap">
+    <span class="prog-text" id="qa-ptxt">0 / 0 answered</span>
+    <div class="prog-track"><div class="prog-fill" id="qa-pfill" style="width:0%"></div></div>
+    <span class="prog-text" id="qa-stxt">✓ 0 correct</span>
+  </div>
+  <div id="qa-list"></div>
+</div>
+</div>
+
+<!-- TAB 2: DEMERITS & FINES -->
+<div id="tab-demerits" class="section">
+<div class="container">
+  <div class="sec-title">⚠️ Demerits &amp; Fines</div>
+  <p class="sec-desc">Every demerit point and fine question that can appear on the G1 exam — choose an option to reveal the answer.</p>
+  <div class="prog-wrap">
+    <span class="prog-text" id="dm-ptxt">0 / 0 answered</span>
+    <div class="prog-track"><div class="prog-fill" id="dm-pfill" style="width:0%"></div></div>
+    <span class="prog-text" id="dm-stxt">✓ 0 correct</span>
+  </div>
+  <div id="dm-list"></div>
+  <div class="divider"></div>
+  <div class="cat-hdr"><h3>📌 Quick Reference — Suspension Thresholds</h3></div>
+  <div class="sus-card">
+    <div class="sus-hdr full">🟢 Fully Licensed (Class G) Drivers</div>
+    <div class="sus-row"><div class="sus-pts" style="color:#4CAF50">2–5</div><div class="sus-desc">Warning letter from MTO urging improvement.</div></div>
+    <div class="sus-row"><div class="sus-pts" style="color:var(--gold)">6–8</div><div class="sus-desc">Second warning. At 8 pts: mandatory $50 demerit interview at ServiceOntario.</div></div>
+    <div class="sus-row"><div class="sus-pts" style="color:var(--orange)">9–14</div><div class="sus-desc">Possible suspension + mandatory interview. Miss it = suspended.</div></div>
+    <div class="sus-row"><div class="sus-pts" style="color:#FF4444">15+</div><div class="sus-desc"><strong>30-day suspension.</strong> After: reduced to 7 pts (stay on record 2 yrs).</div></div>
+  </div>
+  <div class="sus-card">
+    <div class="sus-hdr nov">🟠 Novice Drivers (G1 / G2 / M1 / M2)</div>
+    <div class="sus-row"><div class="sus-pts" style="color:#4CAF50">2–5</div><div class="sus-desc">Warning letter from MTO.</div></div>
+    <div class="sus-row"><div class="sus-pts" style="color:var(--orange)">6–8</div><div class="sus-desc">Possible suspension + mandatory interview.</div></div>
+    <div class="sus-row"><div class="sus-pts" style="color:#FF4444">9+</div><div class="sus-desc"><strong>60-day suspension.</strong> After: reduced to 4 pts.</div></div>
+    <div class="sus-row"><div class="sus-pts" style="color:#FF4444;font-size:12px">Any 4+ pt offence</div><div class="sus-desc">Escalating sanctions: 30-day (1st), 90-day (2nd), licence cancelled (3rd).</div></div>
+  </div>
+</div>
+</div>
+
+<!-- TAB 3: MEMORY SYSTEM -->
+<div id="tab-memory" class="section">
+<div class="container">
+  <div class="sec-title">🧠 Memory System</div>
+  <p class="sec-desc">Mnemonic tricks and visual anchors to lock in every number — the most tested topic on the G1 exam.</p>
+  <div class="mtrick">
+    <div class="mtrick-lbl">🔑 Master Framework: "The Ladder of Danger"</div>
+    <p>Think of demerit points as a <strong>ladder of danger</strong>: 2 → 3 → 4 → 6 → 7.<br><br><strong>"2=Minor · 3=Moderate · 4=Serious · 6=Severe · 7=Maximum (hit &amp; run)"</strong></p>
+  </div>
+  <div class="mem-grid">
+    <div class="mem-card p7">
+      <div class="mem-pts">7</div><div class="mem-pts-lbl">demerit points</div>
+      <ul class="mem-list"><li>Failing to remain at scene of collision (hit &amp; run)</li></ul>
+      <div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.4)">🧠 "7 is the ONLY one — and the WORST one."</div>
+    </div>
+    <div class="mem-card p6">
+      <div class="mem-pts">6</div><div class="mem-pts-lbl">demerit points</div>
+      <ul class="mem-list">
+        <li>Careless driving</li><li>Racing / Stunt driving</li><li>Speed 50+ km/h over</li>
+        <li>Failing to stop for school bus</li><li>Failing to stop for police</li><li>Distracted driving (2nd/3rd+)</li>
+      </ul>
+      <div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.4)">🧠 "6 = SCHOOL BUSES, POLICE, SPEED DEMONS."</div>
+    </div>
+    <div class="mem-card p4">
+      <div class="mem-pts">4</div><div class="mem-pts-lbl">demerit points</div>
+      <ul class="mem-list"><li>Speed 30–49 km/h over</li><li>Following too closely</li><li>Not stopping at pedestrian crossover</li></ul>
+      <div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.4)">🧠 "4 = FTP: Following, Too-fast (30–49), Pedestrian crossover."</div>
+    </div>
+    <div class="mem-card p3">
+      <div class="mem-pts">3</div><div class="mem-pts-lbl">demerit points</div>
+      <ul class="mem-list">
+        <li>Speed 16–29 km/h over</li><li>Distracted driving (1st)</li><li>Through/around railway barrier</li>
+        <li>Failing to yield right-of-way</li><li>Failing to obey stop sign/light</li><li>Improper passing</li>
+      </ul>
+      <div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.4)">🧠 "3 = DISOBEDIENCE offences. Phone, passing, stop signs, yield."</div>
+    </div>
+    <div class="mem-card p2">
+      <div class="mem-pts">2</div><div class="mem-pts-lbl">demerit points</div>
+      <ul class="mem-list">
+        <li>HOV lane misuse</li><li>Failing to lower headlight beam</li><li>Prohibited turns</li>
+        <li>Towing people (skis, bikes)</li><li>Improper turn / Failing to signal</li>
+        <li>Unnecessary slow driving</li><li>Reversing on highway</li><li>Child not in car seat</li>
+      </ul>
+      <div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.4)">🧠 "2 = minor 'should know better' violations."</div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="mtrick">
+    <div class="mtrick-lbl">The "3-4.5-7-9.75" Speed Fine Formula</div>
+    <p>• <strong>1–15 over → $3/km</strong> (0 pts)<br>• <strong>16–29 over → $4.50/km + 3 pts</strong><br>• <strong>30–49 over → $7/km + 4 pts</strong><br>• <strong>50+ over → $9.75/km + 6 pts</strong> + stunt driving risk<br><br><strong>Rule: fine rate goes up, demerit points go up — perfectly paired.</strong></p>
+  </div>
+  <div class="mtrick">
+    <div class="mtrick-lbl">🚌 School Bus — "6-400-20"</div>
+    <p><strong>6</strong> demerit pts · <strong>$400</strong> min fine (1st) · Stop <strong>20 m</strong> away<br>2nd offence: <strong>$1,000–$4,000</strong> + possible <strong>6 months jail</strong>.</p>
+  </div>
+  <div class="mtrick">
+    <div class="mtrick-lbl">📱 Distracted Driving — "3 → 6 → 6"</div>
+    <p><strong>1st:</strong> 3 pts + $615–$1,000 &nbsp;·&nbsp; <strong>2nd:</strong> 6 pts + $615–$2,000 &nbsp;·&nbsp; <strong>3rd+:</strong> 6 pts + $615–$3,000 + 6-month suspension</p>
+  </div>
+  <div class="mtrick">
+    <div class="mtrick-lbl">🚗 Suspension — "15 / 9 Split"</div>
+    <p><strong>Full G → 15 pts → 30-day suspension → reduced to 7 pts</strong><br><strong>Novice → 9 pts → 60-day suspension → reduced to 4 pts</strong></p>
+  </div>
+  <div class="mtrick">
+    <div class="mtrick-lbl">🍺 BAC — "0 · 5 · 8 = N · W · C"</div>
+    <p><strong>0.00%</strong> = Novice (G1/G2) + all under-22 &nbsp;·&nbsp; <strong>0.05%</strong> = Warn range &nbsp;·&nbsp; <strong>0.08%</strong> = Criminal</p>
+  </div>
+  <div class="mtrick">
+    <div class="mtrick-lbl">📏 Key Distances — "The Countdown"</div>
+    <p><strong>150 m</strong> headlights · <strong>30 m</strong> signal/no-pass zone · <strong>20 m</strong> school bus · <strong>9 m</strong> intersection · <strong>5 m</strong> railway · <strong>3 m</strong> hydrant · <strong>2 m</strong> streetcar<br><strong>150 → 30 → 20 → 9 → 5 → 3 → 2</strong></p>
+  </div>
+  <div class="mtrick">
+    <div class="mtrick-lbl">🚫 "No Demerit Points But Big Fines" Traps</div>
+    <p>• <strong>No insurance</strong>: $5,000–$50,000 (0 pts)<br>• <strong>Impaired driving</strong>: Criminal Code — no HTA demerit pts<br>• <strong>Camera tickets</strong>: fine only, no pts<br><strong>Exam trap → "Does no insurance add points?" → NO.</strong></p>
+  </div>
+</div>
+</div>
+
+<!-- TAB 4: QUIZ MODE -->
+<div id="tab-quiz" class="section">
+<div class="container">
+  <div id="qzSetup" class="qz-setup">
+    <div class="sec-title" style="justify-content:center">🎯 Practice Quiz</div>
+    <p>Randomized questions — you need 80% to pass, matching the real G1 exam standard.</p>
+    <button class="qz-btn" onclick="startQuiz('all')">All Topics — 20 Questions</button>
+    <button class="qz-btn" onclick="startQuiz('dm')">Demerits &amp; Fines — 15 Questions</button>
+    <button class="qz-btn sec" onclick="startQuiz('rules')">Road Rules Only — 20 Questions</button>
+  </div>
+  <div id="qzCont" class="qz-cont">
+    <div class="qz-prog-row">
+      <span class="qz-qnum" id="qzNum">Q 1/20</span>
+      <div class="qz-prog-bar"><div class="qz-prog-fill" id="qzFill" style="width:0%"></div></div>
+      <span class="qz-score" id="qzScore">Score: 0</span>
+    </div>
+    <div class="qz-qbox">
+      <div class="qz-qcat" id="qzCat">Topic</div>
+      <div class="qz-qtext" id="qzQ"></div>
+    </div>
+    <div class="qz-opts" id="qzOpts"></div>
+    <div class="qz-fb" id="qzFb"></div>
+    <button class="qz-next" id="qzNext" onclick="nextQ()">Next Question →</button>
+  </div>
+  <div class="qz-result" id="qzResult">
+    <div class="sec-title" style="justify-content:center;font-size:16px">Quiz Complete!</div>
+    <div class="score-big" id="qzBig"></div>
+    <div id="qzMsg"></div>
+    <p id="qzSub" style="margin-top:8px"></p>
+    <button class="qz-btn" onclick="resetQuiz()">Try Again</button>
+    <button class="qz-btn sec" onclick="showTab('memory',null)">📖 Memory Tips</button>
+  </div>
+</div>
+</div>
+
+<script>
+const L=['A','B','C','D'];
+
+// ─── DATA ──────────────────────────────────────────────────────────────────
+
+const qaData=[
+  {cat:"Speed Limits",q:"What is the default speed limit in an Ontario urban area where no speed limit sign is posted?",o:["60 km/h","80 km/h","50 km/h","40 km/h"],a:2,ex:"50 km/h is the default in cities, towns and villages. On rural roads and highways without a posted sign, the default is 80 km/h.",tip:null},
+  {cat:"Speed Limits",q:"What is the maximum speed on a 400-series highway unless otherwise posted?",o:["80 km/h","90 km/h","110 km/h","100 km/h"],a:3,ex:"100 km/h is the default maximum on 400-series highways (401, 400, QEW, DVP, etc.).",tip:null},
+  {cat:"Speed Limits",q:"On a road posted under 80 km/h, at what speed over the limit does a driver trigger 'stunt driving'?",o:["30 km/h over","50 km/h over","40 km/h over","25 km/h over"],a:2,ex:"Driving 40 km/h or more over the posted limit on roads under 80 km/h qualifies as stunt driving. On roads posted 80+ km/h, the threshold is 50 km/h over.",tip:"Stunt driving = immediate roadside licence suspension + vehicle impound."},
+  {cat:"Speed Limits",q:"What must you do when passing a stationary emergency vehicle with flashing lights on a multi-lane road?",o:["Honk to warn the scene","Maintain speed but watch carefully","Move over one lane and slow down","Slow to 20 km/h only"],a:2,ex:"Ontario's Move Over law: move over one lane (if safe) and slow down when passing any stationary emergency vehicle, tow truck, or highway maintenance vehicle with flashing lights.",tip:null},
+  {cat:"Speed Limits",q:"What is the speed limit in a school zone unless otherwise posted?",o:["50 km/h","30 km/h","40 km/h","25 km/h"],a:2,ex:"40 km/h in a school zone. Signs may indicate 15 km/h when children are present. Always follow posted signs.",tip:null},
+  {cat:"Speed Limits",q:"On a rural road with no speed limit signs posted, what is the default maximum speed?",o:["60 km/h","90 km/h","100 km/h","80 km/h"],a:3,ex:"80 km/h is the default on rural highways and roads outside urban areas with no posted sign.",tip:null},
+  {cat:"Right of Way",q:"At an uncontrolled intersection, two vehicles arrive at the same time. Who has the right of way?",o:["The vehicle on the left","The larger vehicle","The vehicle going straight","The vehicle on the right"],a:3,ex:"At an uncontrolled intersection with simultaneous arrivals, the driver on the left must yield to the driver on the right.",tip:null},
+  {cat:"Right of Way",q:"When turning left at an intersection, you must yield to:",o:["Vehicles behind you","Oncoming traffic and pedestrians crossing into your path","Only pedestrians","Only vehicles already in the intersection"],a:1,ex:"When turning left, yield to all oncoming traffic and any pedestrians crossing the road you are turning into.",tip:null},
+  {cat:"Right of Way",q:"When must you yield at a pedestrian crossover?",o:["Only when pedestrians are in the crossover","Only when they wave at you","When they are in the crossover OR waiting at the curb","Only when traffic lights indicate to"],a:2,ex:"You must stop and yield when a pedestrian is in the crossover OR waiting at the curb. Wait until they have fully crossed your half of the road.",tip:"Failing to yield at a pedestrian crossover = 3 demerit points."},
+  {cat:"Right of Way",q:"When entering a roundabout, who has the right of way?",o:["Vehicle entering from the right","Traffic already inside the roundabout","Vehicle entering from the left","Vehicle going straight through"],a:1,ex:"Vehicles already circulating inside the roundabout always have the right of way. Yield before entering.",tip:null},
+  {cat:"Right of Way",q:"When an emergency vehicle with flashing lights and siren approaches, you must:",o:["Speed up to clear the intersection","Slow down and match its speed","Pull to the right and stop until it passes","Continue driving and let it pass"],a:2,ex:"Always pull to the right and stop until the emergency vehicle has completely passed, unless directed otherwise by police.",tip:null},
+  {cat:"Right of Way",q:"At a T-intersection with no signs, who has the right of way?",o:["The driver entering the T","The driver on the terminating road","The driver on the through road","The driver going straight always"],a:2,ex:"The driver on the through (continuing) road has right of way. The driver on the terminating road must yield.",tip:null},
+  {cat:"Right of Way",q:"Exiting a private driveway, you must yield to:",o:["Only oncoming vehicles","Only pedestrians on the sidewalk","All vehicles on the road and all pedestrians on the sidewalk","Nobody — you have the right of way"],a:2,ex:"Yield to all road traffic AND all pedestrians on any sidewalk before entering the roadway from a private driveway.",tip:null},
+  {cat:"Right of Way",q:"At a four-way stop, you arrive simultaneously with a driver directly to your right. Who goes first?",o:["You — you were there first","The larger vehicle","The driver to your right","The driver going straight"],a:2,ex:"At a four-way stop with simultaneous arrivals, yield to the driver on your right.",tip:null},
+  {cat:"Traffic Signals & Signs",q:"What does a flashing red traffic light mean?",o:["Slow down and proceed with caution","Stop, then proceed when safe (treat as stop sign)","Emergency vehicles approaching","Yield to oncoming traffic"],a:1,ex:"A flashing red light means treat it exactly like a stop sign: come to a complete stop and proceed only when safe.",tip:null},
+  {cat:"Traffic Signals & Signs",q:"What does a flashing yellow traffic light mean?",o:["Come to a complete stop","Prepare to stop — light about to turn red","Slow down and proceed with caution","Emergency ahead — stop immediately"],a:2,ex:"Flashing yellow means slow down and proceed with caution. No full stop required.",tip:null},
+  {cat:"Traffic Signals & Signs",q:"A green arrow pointing left at a traffic light means:",o:["Yield to oncoming traffic, then turn left","You may turn left — oncoming traffic is stopped","Left turns are prohibited","Turn left only after pedestrians cross"],a:1,ex:"A green left arrow is a protected turn. Oncoming traffic is held at a red light. Still yield to any pedestrians in the crosswalk.",tip:null},
+  {cat:"Traffic Signals & Signs",q:"Can you turn right on a red light in Ontario?",o:["Yes, always","No, never","Yes, after a complete stop and yielding — unless a sign prohibits it","Only between 7 PM and 7 AM"],a:2,ex:"Right turns on red are permitted in Ontario after a complete stop and yielding to pedestrians and cross traffic, unless a 'No Turn on Red' sign is posted.",tip:null},
+  {cat:"Traffic Signals & Signs",q:"What does a yellow (amber) traffic light mean?",o:["Speed up to clear the intersection","Stop if you safely can before the stop line","Yield to cross traffic then proceed","The light is about to turn green"],a:1,ex:"Yellow means the light is about to turn red. Stop if you can do so safely before the stop line. Only proceed if stopping would be unsafe.",tip:null},
+  {cat:"Traffic Signals & Signs",q:"What shape are warning signs in Ontario?",o:["Circle","Octagon","Diamond (square rotated 45°)","Rectangle"],a:2,ex:"Warning signs are yellow diamonds with black markings, alerting drivers to upcoming hazards or road conditions.",tip:null},
+  {cat:"Traffic Signals & Signs",q:"What do orange signs mean for fines?",o:["No change to fines","Fines are reduced","Fines are doubled when workers are present","Fines are tripled at all times"],a:2,ex:"All traffic violation fines are doubled in construction (orange) zones when workers are present. Same applies to community safety zones.",tip:null},
+  {cat:"Traffic Signals & Signs",q:"A white rectangular sign with black text typically indicates:",o:["Warning of upcoming hazard","A regulatory rule you must follow","Directions to a destination","An information or service sign"],a:1,ex:"White rectangular signs with black text are regulatory signs (speed limits, no parking, turn restrictions) — rules you are legally required to follow.",tip:null},
+  {cat:"Lane Usage & Passing",q:"On a multi-lane highway, which lane should you normally travel in?",o:["The left lane at all times","The centre lane","The right lane, unless passing or turning left","Any lane you prefer"],a:2,ex:"Use the right lane unless passing or turning left. The left lane is for passing only. Staying slow in the left lane can be ticketed as unnecessary slow driving.",tip:null},
+  {cat:"Lane Usage & Passing",q:"What is the standard following distance on a highway in normal conditions?",o:["1-second rule","At least 2–3 seconds","5-second rule","10 car lengths"],a:1,ex:"Maintain at least 2–3 seconds of following distance under normal conditions. Increase to 4–6+ seconds in rain, snow, or fog. Use 6+ seconds behind large trucks.",tip:null},
+  {cat:"Lane Usage & Passing",q:"When is it legal to pass on the right in Ontario?",o:["Whenever you feel safe","On any multi-lane road at any time","When the vehicle ahead is turning left and there's sufficient room, or on a one-way/multi-lane road","Never — always illegal"],a:2,ex:"Passing on the right is legal when: (1) the vehicle ahead is turning left and there's room, or (2) on a one-way street or multi-lane road where it is not prohibited.",tip:null},
+  {cat:"Lane Usage & Passing",q:"Where is it illegal to pass another vehicle?",o:["Only on curves","Within 30 m of a bridge, tunnel, railway crossing or intersection; on curves with limited visibility; where a solid yellow line is on your side","Only in school zones","Only where a No Passing sign is posted"],a:1,ex:"Passing is prohibited within 30 m of bridges, tunnels, railway crossings and intersections; on curves with limited visibility; where a solid yellow line is on your side; and where No Passing signs are posted.",tip:null},
+  {cat:"Lane Usage & Passing",q:"Who can use an HOV (High Occupancy Vehicle) lane?",o:["Any vehicle at any time","Only taxis and buses","Vehicles with 2+ occupants, motorcycles, and licensed electric vehicles (green plates)","Only vehicles with 3+ occupants"],a:2,ex:"HOV lanes are reserved for vehicles with 2 or more occupants (driver + at least 1 passenger), motorcycles, and licensed green-plate electric vehicles, unless signs specify otherwise.",tip:"Improper HOV lane use = 2 demerit points."},
+  {cat:"Lane Usage & Passing",q:"Before changing lanes, you must:",o:["Signal, then change immediately","Check mirrors, signal, check blind spot, confirm the lane is clear, then move","Only use your signal if other vehicles are nearby","Just check your mirrors"],a:1,ex:"Full process: check mirrors → signal → check blind spot → confirm the lane is clear → move. Signal at least 30 m ahead in zones over 60 km/h.",tip:null},
+  {cat:"School Bus Rules",q:"A school bus ahead has its upper red lights flashing and stop arm extended. What must you do?",o:["Slow to 20 km/h and pass carefully","Stop at least 20 metres away and wait until lights stop and arm retracts","Honk and proceed slowly","Stop only if you are directly behind the bus"],a:1,ex:"Stop at least 20 metres from the bus. Do not proceed until the red lights stop flashing and the stop arm is fully retracted. This applies in both directions on a two-lane road.",tip:"Failing to stop for a school bus = 6 demerit points + minimum $400 fine."},
+  {cat:"School Bus Rules",q:"On a divided highway with a median, when a school bus has red lights flashing, who must stop?",o:["Everyone in both directions","Only traffic behind the bus (same direction)","Only oncoming traffic","Nobody — divided highways are exempt"],a:1,ex:"On a divided highway with a physical median, only traffic travelling in the same direction as the bus (following it) must stop. Oncoming traffic does not have to stop.",tip:null},
+  {cat:"School Bus Rules",q:"What do flashing amber (yellow) lights on a school bus indicate?",o:["The bus has stopped and is loading/unloading","The bus is about to stop — slow down and prepare to stop","The bus is cancelling its stop","The driver is signalling a turn"],a:1,ex:"Amber lights mean the bus is about to stop. Slow down and be ready to stop. Red lights will activate shortly — do not pass.",tip:null},
+  {cat:"School Bus Rules",q:"What is the minimum fine for a FIRST offence of failing to stop for a school bus?",o:["$200","$150","$400","$1,000"],a:2,ex:"First offence: $400–$2,000 fine + 6 demerit points. Second offence within 5 years: $1,000–$4,000 + possible jail up to 6 months.",tip:null},
+  {cat:"Alcohol & Impaired Driving",q:"What is the BAC limit for G1 and G2 drivers in Ontario?",o:["0.05%","0.08%","0.03%","0.00% — zero tolerance"],a:3,ex:"Zero tolerance applies to all novice drivers (G1, G2, M1, M2) and all drivers under 22 years old. Any detectable alcohol is an offence.",tip:null},
+  {cat:"Alcohol & Impaired Driving",q:"For fully licensed drivers, at what BAC level does the 'warn range' roadside suspension begin?",o:["0.03%","0.08%","0.10%","0.05%"],a:3,ex:"A BAC of 0.05–0.079% triggers an immediate roadside suspension: 3 days (1st), 7 days (2nd), 30 days (3rd+), plus a $250 reinstatement fee.",tip:null},
+  {cat:"Alcohol & Impaired Driving",q:"If a fully licensed driver fails a breathalyzer (BAC ≥ 0.08%), their immediate roadside suspension is:",o:["30 days","7 days","90 days","14 days"],a:2,ex:"Failing a breathalyzer (BAC ≥ 0.08%) = 90-day immediate roadside licence suspension + potential 7-day vehicle impoundment (first offence).",tip:null},
+  {cat:"Alcohol & Impaired Driving",q:"A driver refuses to provide a breath sample when demanded by police. What is the consequence?",o:["Only a fine","The same criminal penalties as driving over 0.08% BAC","A warning and release","A 3-day licence suspension only"],a:1,ex:"Refusing a breath, blood, or oral fluid sample when demanded by police is a criminal offence with the same penalties as being convicted over 0.08% BAC.",tip:null},
+  {cat:"Alcohol & Impaired Driving",q:"What is the minimum licence suspension for a FIRST criminal impaired driving conviction?",o:["30 days","6 months","3 months","1 year"],a:3,ex:"First criminal conviction: minimum 1-year licence suspension + minimum $1,000 fine. Second: minimum 30 days jail + 2-year suspension. Third+: minimum 120 days jail + possible lifetime suspension.",tip:null},
+  {cat:"Alcohol & Impaired Driving",q:"Can you drive after consuming cannabis in Ontario?",o:["Yes, if you feel fine","Yes, if it's been 1 hour","No — drug-impaired driving carries the same penalties as alcohol impairment","Only on local roads"],a:2,ex:"Driving while impaired by cannabis or any drug is illegal and treated the same as alcohol-impaired driving. Novice and under-22 drivers must have zero cannabis presence.",tip:null},
+  {cat:"Alcohol & Impaired Driving",q:"What BAC level triggers criminal charges for fully licensed drivers?",o:["0.05%","0.06%","0.08%","0.10%"],a:2,ex:"0.08% (80 mg per 100 mL of blood) is the criminal limit under the Criminal Code of Canada. 0.05–0.079% is the administrative 'warn range'.",tip:null},
+  {cat:"Seat Belts & Child Safety",q:"Who is legally responsible if a passenger under 16 is not wearing a seat belt?",o:["The passenger","The vehicle owner","The driver","Both the driver and passenger equally"],a:2,ex:"The driver is always responsible for ensuring all passengers under 16 are belted. Each unbelted passenger under 16 = a separate charge + 2 demerit points against the driver.",tip:null},
+  {cat:"Seat Belts & Child Safety",q:"At what height AND weight can a child move from a booster seat to a regular seat belt?",o:["Over 18 kg and 120 cm","Over 25 kg only","At least 36 kg (80 lbs) AND at least 145 cm (4'9\")","Any size, as long as the belt fits"],a:2,ex:"A child must be at least 36 kg (80 lbs) AND 145 cm (4'9\") tall, and the regular seat belt must fit properly — lap belt across hips, shoulder belt across chest.",tip:null},
+  {cat:"Seat Belts & Child Safety",q:"What is the maximum fine for not wearing a seat belt in Ontario?",o:["$250","$500","$1,000","$2,500"],a:2,ex:"Up to $1,000 fine. If the driver fails to ensure a passenger under 16 is belted, they also receive 2 demerit points per unrestrained passenger.",tip:null},
+  {cat:"Seat Belts & Child Safety",q:"Where is the safest position for children under 13 in a vehicle?",o:["Anywhere with a proper seat belt","In the front seat with airbag off","The back seat","The front seat on short trips only"],a:2,ex:"Children under 13 should always ride in the back seat. They should never be in the front seat with an active airbag if in a rear-facing child seat.",tip:null},
+  {cat:"Distracted Driving",q:"Is it legal to hold your phone while stopped at a red light in Ontario?",o:["Yes — the car is stopped","Yes, for quick checks only","No — holding a hand-held device while in traffic is illegal","Only if hands-free mode is on"],a:2,ex:"Holding or using a hand-held device while operating a vehicle (including at a red light) is illegal. Your vehicle must be safely parked off the roadway to use a hand-held device.",tip:"3 demerit points + $615–$1,000 fine (first offence)."},
+  {cat:"Distracted Driving",q:"Can fully licensed (G class) drivers use a Bluetooth hands-free device while driving?",o:["No — all devices are banned","Yes — hands-free use is permitted for fully licensed drivers","Only on highways","Only if under 60 km/h"],a:1,ex:"Fully licensed Class G drivers may use hands-free (Bluetooth) devices. Novice drivers (G1, G2) may NOT use any device — hand-held or hands-free.",tip:null},
+  {cat:"Distracted Driving",q:"G1 and G2 drivers are prohibited from using:",o:["Only hand-held devices","Only devices while moving","Any communication device — hand-held OR hands-free","Only social media apps"],a:2,ex:"Novice drivers (G1, G2, M1, M2) cannot use any communication or entertainment device while driving — including hands-free Bluetooth, which fully licensed drivers are permitted to use.",tip:null},
+  {cat:"Distracted Driving",q:"What is the fine range for a THIRD distracted driving conviction?",o:["$615–$1,000","$615–$2,000","$500–$1,500","$615–$3,000 + possible 6-month suspension"],a:3,ex:"Third and subsequent distracted driving convictions: $615–$3,000 fine + 6 demerit points + possible 6-month licence suspension.",tip:null},
+  {cat:"G1 & G2 Restrictions",q:"What are the time-of-day driving restrictions for G1 licence holders?",o:["No driving after 10 PM","No driving between 11 PM and 5 AM","No driving between midnight and 5 AM","No restrictions on timing"],a:2,ex:"G1 drivers cannot drive between midnight and 5 AM. The accompanying licensed driver must sit in the front passenger seat.",tip:null},
+  {cat:"G1 & G2 Restrictions",q:"Can a G1 driver drive on Highway 400?",o:["Yes, with a licensed accompanying driver","Yes, any time","No — G1 drivers cannot drive on 400-series highways or high-speed expressways","Only between 5 AM and midnight"],a:2,ex:"G1 drivers are prohibited from driving on 400-series highways (400, 401, 404, 407, QEW, DVP) or any high-speed expressway — even with an accompanying driver.",tip:null},
+  {cat:"G1 & G2 Restrictions",q:"How long must you hold a G1 licence before taking the G2 road test?",o:["6 months","12 months (or 8 months with approved driver education)","18 months","24 months"],a:1,ex:"12 months minimum — reduced to 8 months if you complete an approved Beginner Driver Education (BDE) course.",tip:null},
+  {cat:"G1 & G2 Restrictions",q:"The accompanying driver of a G1 holder must:",o:["Have any valid driver's licence","Have a Class G licence with at least 2 years of experience","Have a Class G or higher licence with at least 4 years experience, BAC ≤ 0.05%, and sit in the front passenger seat","Be over 25 years old"],a:2,ex:"The accompanying driver must have a valid Class G (or higher) licence, at least 4 years of driving experience, a BAC of 0.05% or less, and must sit in the front passenger seat.",tip:null},
+  {cat:"G1 & G2 Restrictions",q:"What happens to a novice driver who accumulates 9 or more demerit points?",o:["They receive a warning letter only","Their licence is suspended for 30 days","Their licence is suspended for 60 days","Their licence is immediately cancelled"],a:2,ex:"A novice driver (G1, G2, M1, M2) with 9+ demerit points receives a 60-day licence suspension. After reinstatement, points are reduced to 4 but remain on record for 2 years.",tip:null},
+  {cat:"Parking & Stopping",q:"How far from a fire hydrant must you park your vehicle?",o:["1 metre","5 metres","3 metres","2 metres"],a:2,ex:"You must park at least 3 metres (approximately 10 feet) from a fire hydrant.",tip:null},
+  {cat:"Parking & Stopping",q:"How far from an intersection are you prohibited from parking?",o:["5 metres","9 metres","15 metres","3 metres"],a:1,ex:"You cannot park within 9 metres (about 30 feet) of an intersection, unless signs indicate otherwise.",tip:null},
+  {cat:"Parking & Stopping",q:"When parked on a hill facing downhill, how should you position your wheels?",o:["Straight ahead","Turned away from the curb","Turned toward the curb","It doesn't matter — just use the parking brake"],a:2,ex:"Facing downhill: turn wheels toward the curb. Facing uphill: turn wheels away from the curb. This prevents the vehicle from rolling into traffic if the parking brake fails.",tip:null},
+  {cat:"Parking & Stopping",q:"When parallel parked, how close must your vehicle be to the curb?",o:["Within 30 cm","Within 15 cm (about 6 inches)","Within 50 cm","Within 1 metre"],a:1,ex:"When parallel parked, your vehicle must be within 15 cm (approximately 6 inches) of the curb.",tip:null},
+  {cat:"Railway Crossings",q:"At a railway crossing with flashing lights and bells, how far must you stop from the nearest rail?",o:["1 metre","2 metres","5 metres","10 metres"],a:2,ex:"Stop at least 5 metres from the nearest rail at a railway crossing with active warning lights, bells, or gates.",tip:null},
+  {cat:"Railway Crossings",q:"Is it legal to drive around or under a lowered railway crossing gate?",o:["Yes, if no train is visible","Yes, if emergency vehicles are behind you","No — it is illegal and extremely dangerous","Only in a declared emergency"],a:2,ex:"Never drive through, around, or under a railway crossing barrier. It is illegal regardless of circumstances and carries 3 demerit points.",tip:null},
+  {cat:"Railway Crossings",q:"When approaching a stopped streetcar with no safety island, what must you do?",o:["Pass on the right at 15 km/h","Stop at least 2 metres behind the nearest door and wait until doors close","Honk and proceed slowly","Stop 5 metres behind and wait"],a:1,ex:"Stop at least 2 metres behind the nearest door. Do not proceed until the doors close and passengers have cleared the road. With a safety island, you may pass slowly on the left.",tip:null},
+  {cat:"Collisions & Emergencies",q:"When must you report a collision to police?",o:["Only if seriously injured","Always, for any collision","If there is injury or death, or total property damage exceeds $2,000","Only if the other driver refuses to share information"],a:2,ex:"Report to police if there is any injury, death, or if total property damage exceeds $2,000. Minor collisions under $2,000 with no injury may be handled at a Collision Reporting Centre.",tip:null},
+  {cat:"Collisions & Emergencies",q:"If you are involved in a collision with injury or death, you must:",o:["Drive to the nearest police station to report","Stop, render assistance, call 911, remain at scene, and provide your details","Take photos and leave, then report online","Call your insurer and wait"],a:1,ex:"You must stop immediately, render all possible assistance, call 911, remain at the scene, and provide your name, address, licence, and registration to police and others involved.",tip:"Failing to remain at the scene = 7 demerit points — the maximum under the HTA."},
+  {cat:"Collisions & Emergencies",q:"If your vehicle's brakes fail while driving, you should:",o:["Turn off the ignition immediately","Pump the brakes rapidly, downshift, and use the parking brake gradually","Press the brake pedal harder and harder","Steer into oncoming traffic to slow down"],a:1,ex:"Pump the brakes rapidly, downshift to lower gears for engine braking, then apply the parking brake gradually. Steer toward an open space or uphill slope.",tip:null},
+  {cat:"Collisions & Emergencies",q:"What is the correct action if your vehicle goes into a rear-wheel skid?",o:["Steer away from the direction of the skid","Brake hard and steer straight","Steer in the direction the rear is sliding (into the skid) and ease off the accelerator","Accelerate to regain traction"],a:2,ex:"For a rear-wheel skid, steer in the direction the rear of the vehicle is sliding (into the skid) and ease off the accelerator. Do not brake suddenly.",tip:null},
+  {cat:"Highway Driving",q:"When entering a highway using an acceleration lane, who has the right of way?",o:["The vehicle entering the highway","You, as long as you signal","Traffic already on the highway","Whoever is going faster"],a:2,ex:"Traffic already on the highway always has the right of way. Accelerate to highway speed and find a safe gap before merging.",tip:null},
+  {cat:"Highway Driving",q:"Are U-turns permitted on a 400-series highway?",o:["Yes, at designated median openings","Yes if no traffic is coming","No — U-turns are prohibited on controlled-access highways","Only for emergency vehicles"],a:2,ex:"U-turns are illegal on all controlled-access highways including 400-series, QEW, and DVP.",tip:null},
+  {cat:"Weather & Visibility",q:"When are you required by law to use your headlights?",o:["Only at night","When raining heavily only","From 30 min after sunset to 30 min before sunrise, and when visibility is under 150 m","Only when in a tunnel"],a:2,ex:"Headlights are required from 30 minutes after sunset to 30 minutes before sunrise, and any time visibility is reduced to less than 150 metres (rain, fog, snow).",tip:null},
+  {cat:"Weather & Visibility",q:"When driving in fog, which lights should you use?",o:["High-beam headlights","Hazard lights only","Low-beam headlights (and fog lights if equipped)","No lights — they reflect and reduce visibility"],a:2,ex:"Use low-beam headlights in fog. High-beams reflect off fog and worsen visibility. Fog lights (if equipped) also help. Reduce speed and increase following distance.",tip:null},
+  {cat:"Sharing the Road",q:"On a road with a speed limit over 60 km/h, what is the minimum clearance when passing a cyclist?",o:["0.5 metres","1 metre","1.5 metres","2 metres"],a:2,ex:"At least 1.5 metres of clearance is required when passing a cyclist on roads posted over 60 km/h. On roads at 60 km/h or under, the minimum is 1 metre.",tip:null},
+  {cat:"Sharing the Road",q:"What is the 'Dutch Reach' technique?",o:["A braking method on wet roads","Checking mirrors before turning","Opening your car door with your far hand to naturally look back for cyclists","A lane-changing technique at roundabouts"],a:2,ex:"The Dutch Reach means opening your car door using your far hand (opposite side from the door). This rotates your body so you naturally look back and can spot approaching cyclists, preventing dangerous dooring accidents.",tip:null},
+  {cat:"Sharing the Road",q:"When a person with a white cane is waiting to cross, you must:",o:["Honk to signal it's safe","Stop and yield, regardless of traffic signals","Only yield if a traffic signal indicates so","Slow to 20 km/h and proceed carefully"],a:1,ex:"A white cane indicates a visually impaired person. Stop and yield the right of way whenever they are crossing or about to cross — regardless of traffic signals.",tip:null},
+];
+
+const dmData=[
+  {cat:"Demerit Points",q:"How many demerit points do you receive for failing to remain at the scene of a collision (hit and run)?",o:["4 points","5 points","6 points","7 points"],a:3,ex:"Failing to remain at the scene = 7 demerit points. This is the HIGHEST demerit point penalty under the Ontario HTA.",tip:null},
+  {cat:"Demerit Points",q:"How many demerit points does careless driving carry?",o:["3 points","4 points","6 points","7 points"],a:2,ex:"Careless driving = 6 demerit points. One of the most serious HTA offences.",tip:null},
+  {cat:"Demerit Points",q:"How many demerit points for failing to stop for a school bus?",o:["2 points","3 points","4 points","6 points"],a:3,ex:"Failing to stop for a school bus = 6 demerit points + minimum $400 fine (first offence).",tip:null},
+  {cat:"Demerit Points",q:"Speeding 30–49 km/h over the posted limit results in how many demerit points?",o:["2 points","3 points","4 points","6 points"],a:2,ex:"Speeding 30–49 km/h over = 4 demerit points + $7 per km over the limit in fines.",tip:null},
+  {cat:"Demerit Points",q:"Speeding 16–29 km/h over the posted limit results in how many demerit points?",o:["0 points","2 points","3 points","4 points"],a:2,ex:"Speeding 16–29 km/h over = 3 demerit points + $4.50 per km over the limit in fines.",tip:null},
+  {cat:"Demerit Points",q:"Speeding 50 km/h or more over the posted limit results in how many demerit points?",o:["4 points","5 points","6 points","7 points"],a:2,ex:"Speeding 50+ km/h over = 6 demerit points + $9.75 per km over + possible stunt driving charges.",tip:null},
+  {cat:"Demerit Points",q:"A first offence of distracted driving (hand-held device) carries how many demerit points?",o:["1 point","2 points","3 points","4 points"],a:2,ex:"First distracted driving conviction = 3 demerit points + $615–$1,000 fine.",tip:null},
+  {cat:"Demerit Points",q:"A second or third distracted driving conviction carries how many demerit points?",o:["3 points","4 points","5 points","6 points"],a:3,ex:"Second and third+ distracted driving convictions each carry 6 demerit points. Fines: up to $2,000 (2nd) and $3,000 (3rd+).",tip:null},
+  {cat:"Demerit Points",q:"How many demerit points for following too closely (tailgating)?",o:["2 points","3 points","4 points","6 points"],a:2,ex:"Following too closely (tailgating) = 4 demerit points.",tip:null},
+  {cat:"Demerit Points",q:"How many demerit points for not stopping at a pedestrian crossover?",o:["2 points","3 points","4 points","6 points"],a:2,ex:"Failing to stop at a pedestrian crossover = 4 demerit points.",tip:null},
+  {cat:"Demerit Points",q:"How many demerit points for failing to yield the right-of-way?",o:["2 points","3 points","4 points","6 points"],a:1,ex:"Failing to yield right-of-way = 3 demerit points.",tip:null},
+  {cat:"Demerit Points",q:"How many demerit points for failing to obey a stop sign or traffic light?",o:["2 points","3 points","4 points","6 points"],a:1,ex:"Failing to obey a stop sign, traffic light, or railway crossing signal = 3 demerit points.",tip:null},
+  {cat:"Demerit Points",q:"Improper use of an HOV lane results in how many demerit points?",o:["0 points","1 point","2 points","3 points"],a:2,ex:"Improper HOV lane use = 2 demerit points.",tip:null},
+  {cat:"Demerit Points",q:"Failing to signal before a turn results in how many demerit points?",o:["0 points","1 point","2 points","3 points"],a:2,ex:"Failing to signal = 2 demerit points.",tip:null},
+  {cat:"Demerit Points",q:"A driver fails to ensure their infant is secured in a proper car seat. How many demerit points?",o:["0 points","1 point","2 points","3 points"],a:2,ex:"Failing to ensure an infant or toddler passenger is properly secured = 2 demerit points.",tip:null},
+  {cat:"Demerit Points",q:"Driving through or around a lowered railway crossing barrier results in how many demerit points?",o:["2 points","3 points","4 points","6 points"],a:1,ex:"Driving through, around, or under a railway crossing barrier = 3 demerit points.",tip:null},
+  {cat:"Demerit Points",q:"Reversing on a highway carries how many demerit points?",o:["0 points","1 point","2 points","3 points"],a:2,ex:"Reversing on a highway = 2 demerit points.",tip:null},
+  {cat:"Demerit Points",q:"Racing or stunt driving carries how many demerit points?",o:["3 points","4 points","6 points","7 points"],a:2,ex:"Racing and stunt driving = 6 demerit points — same level as careless driving and failing to stop for a school bus.",tip:null},
+  {cat:"Fines",q:"How are fines calculated for speeding 1–15 km/h over the limit?",o:["$2 per km over","$3 per km over (no demerit points)","$4.50 per km over","Flat $150 fine"],a:1,ex:"Speeding 1–15 km/h over = $3 per km over the limit. No demerit points in this range, but the conviction stays on your record.",tip:null},
+  {cat:"Fines",q:"What is the fine rate for speeding 16–29 km/h over the posted limit?",o:["$3 per km over","$4.50 per km over + 3 demerit points","$7 per km over + 3 demerit points","$9.75 per km over + 4 demerit points"],a:1,ex:"Speeding 16–29 km/h over = $4.50 per km over + 3 demerit points.",tip:null},
+  {cat:"Fines",q:"What is the fine rate for speeding 30–49 km/h over the posted limit?",o:["$4.50 per km over","$7 per km over + 4 demerit points","$9.75 per km over + 4 demerit points","$5 per km over + 3 demerit points"],a:1,ex:"Speeding 30–49 km/h over = $7 per km over + 4 demerit points. Example: 40 km/h over = $7 × 40 = $280.",tip:null},
+  {cat:"Fines",q:"What is the fine rate for speeding 50 km/h or more over the posted limit?",o:["$7 per km over","$8 per km over","$9.75 per km over + 6 demerit points","$12 per km over + 6 demerit points"],a:2,ex:"Speeding 50+ km/h over = $9.75 per km over + 6 demerit points + possible stunt driving charges.",tip:null},
+  {cat:"Fines",q:"What is the minimum fine for a FIRST offence of driving without insurance in Ontario?",o:["$500","$2,500","$5,000","$1,000"],a:2,ex:"Driving without valid insurance: minimum $5,000 fine, up to $50,000. ZERO demerit points — but an extremely severe financial penalty.",tip:null},
+  {cat:"Fines",q:"How are fines affected in a construction zone with workers present?",o:["No change","Increased by $500","Doubled","Tripled"],a:2,ex:"All traffic violation fines are doubled in construction (orange) zones when workers are present. The same applies to community safety zones.",tip:null},
+  {cat:"Fines",q:"A speed camera issues a ticket for going 25 km/h over the limit. How many demerit points?",o:["3 demerit points","0 — no demerit points","2 demerit points","4 demerit points"],a:1,ex:"Speed camera and red-light camera tickets result in fines ONLY — no demerit points. Cameras record the plate, not the driver's identity.",tip:null},
+  {cat:"Fines",q:"What is the fine range for a FIRST distracted driving offence?",o:["$150–$500","$300–$800","$615–$1,000","$1,000–$2,000"],a:2,ex:"First distracted driving offence: $615–$1,000 fine + 3 demerit points. Second: $615–$2,000 + 6 pts. Third+: $615–$3,000 + 6 pts + possible 6-month suspension.",tip:null},
+  {cat:"Fines",q:"What is the minimum fine for failing to stop for a school bus (first offence)?",o:["$150","$200","$400","$750"],a:2,ex:"First offence for failing to stop for a school bus: $400–$2,000 fine + 6 demerit points.",tip:null},
+  {cat:"Licence Suspension",q:"At how many demerit points is a FULLY licensed (Class G) driver's licence automatically suspended?",o:["9 points","12 points","15 points","10 points"],a:2,ex:"Fully licensed drivers are suspended for 30 days when they reach 15 or more demerit points.",tip:null},
+  {cat:"Licence Suspension",q:"At how many demerit points is a NOVICE driver's (G1/G2) licence suspended?",o:["6 points","8 points","9 points","12 points"],a:2,ex:"Novice drivers (G1, G2, M1, M2) face a 60-day suspension when they reach 9 or more demerit points.",tip:null},
+  {cat:"Licence Suspension",q:"How long do demerit points remain on your Ontario driving record?",o:["1 year from offence","2 years from offence","3 years from offence","5 years from offence"],a:1,ex:"Demerit points stay on your record for 2 years from the date of the offence. Convictions remain visible to insurance companies for 3 years.",tip:null},
+  {cat:"Licence Suspension",q:"After a fully licensed driver's 30-day demerit suspension, their points are reduced to:",o:["0 points","4 points","7 points","10 points"],a:2,ex:"After a 30-day suspension, a fully licensed driver's points are reduced to 7. After a novice driver's 60-day suspension, points are reduced to 4. Remaining points stay on record 2 years.",tip:null},
+  {cat:"Licence Suspension",q:"A novice driver gets one conviction carrying 4 demerit points. What happens under escalating sanctions?",o:["Warning letter only","2-year suspension","30-day licence suspension (1st offence)","Licence is cancelled immediately"],a:2,ex:"Any single 4+ demerit point conviction triggers escalating sanctions for novice drivers: 30-day suspension (1st offence), 90-day (2nd), licence cancellation (3rd).",tip:null},
+  {cat:"Licence Suspension",q:"The fee for a mandatory demerit point interview is:",o:["Free","$25","$50","$100"],a:2,ex:"The demerit point interview fee is $50, paid in person at any ServiceOntario centre. Failure to pay results in licence cancellation.",tip:null},
+];
+
+// ─── TRACK STATE ────────────────────────────────────────────────────────────
+let qaAns=0, qaOk=0, dmAns=0, dmOk=0;
+
+// ─── RENDER QUESTIONS ────────────────────────────────────────────────────────
+function render(data, containerId, prefix, ptxtId, pfillId, stxtId){
+  const root=document.getElementById(containerId);
+  root.innerHTML='';
+  const cats={};
+  data.forEach((q,i)=>{
+    if(!cats[q.cat])cats[q.cat]=[];
+    cats[q.cat].push({...q,idx:i});
+  });
+  Object.entries(cats).forEach(([cat,qs])=>{
+    const h=document.createElement('div');
+    h.className='cat-hdr';
+    h.innerHTML=`<h3>${cat}</h3><span>${qs.length} question${qs.length>1?'s':''}</span>`;
+    root.appendChild(h);
+    qs.forEach(q=>{
+      const card=document.createElement('div');
+      card.className='mc-card';
+      card.id=`${prefix}c${q.idx}`;
+
+      const hdr=document.createElement('div');
+      hdr.className='mc-hdr';
+      const num=document.createElement('span');
+      num.className='mc-num';
+      num.id=`${prefix}n${q.idx}`;
+      num.textContent=q.idx+1;
+      const qt=document.createElement('div');
+      qt.className='mc-q';
+      qt.textContent=q.q;
+      hdr.appendChild(num);hdr.appendChild(qt);
+      card.appendChild(hdr);
+
+      const opts=document.createElement('div');
+      opts.className='mc-opts';
+      opts.id=`${prefix}o${q.idx}`;
+      q.o.forEach((opt,oi)=>{
+        const btn=document.createElement('button');
+        btn.className='mc-opt';
+        btn.innerHTML=`<span class="opt-ltr">${L[oi]}</span>${opt}<span class="opt-icon"></span>`;
+        btn.onclick=()=>pick(q,oi,prefix,data,ptxtId,pfillId,stxtId);
+        opts.appendChild(btn);
+      });
+      card.appendChild(opts);
+
+      const fb=document.createElement('div');
+      fb.className='mc-fb';
+      fb.id=`${prefix}f${q.idx}`;
+      card.appendChild(fb);
+
+      if(q.tip){
+        const tip=document.createElement('div');
+        tip.className='mc-tip';
+        tip.id=`${prefix}t${q.idx}`;
+        tip.textContent='💡 '+q.tip;
+        card.appendChild(tip);
+      }
+      root.appendChild(card);
+    });
+  });
+  document.getElementById(ptxtId).textContent=`0 / ${data.length} answered`;
+  document.getElementById(stxtId).textContent=`✓ 0 correct`;
+}
+
+function pick(q,sel,prefix,data,ptxtId,pfillId,stxtId){
+  const btns=document.querySelectorAll(`#${prefix}o${q.idx} .mc-opt`);
+  btns.forEach(b=>{b.disabled=true;b.onclick=null});
+  const correct=sel===q.a;
+
+  btns[q.a].classList.add('opt-ok');
+  btns[q.a].querySelector('.opt-icon').textContent='✓';
+  if(!correct){
+    btns[sel].classList.add('opt-no');
+    btns[sel].querySelector('.opt-icon').textContent='✗';
+  }
+
+  const card=document.getElementById(`${prefix}c${q.idx}`);
+  card.classList.add(correct?'ans-ok':'ans-no');
+  const num=document.getElementById(`${prefix}n${q.idx}`);
+  num.classList.add(correct?'ok':'no');
+  num.textContent=correct?'✓':'✗';
+
+  const fb=document.getElementById(`${prefix}f${q.idx}`);
+  fb.className=`mc-fb show ${correct?'fb-ok':'fb-no'}`;
+  fb.textContent=(correct?'✓ Correct! ':'✗ Incorrect. ')+q.ex;
+
+  const tip=document.getElementById(`${prefix}t${q.idx}`);
+  if(tip)tip.classList.add('show');
+
+  if(prefix==='qa'){qaAns++;if(correct)qaOk++;updateProg('qa',qaAns,qaOk,qaData.length,ptxtId,pfillId,stxtId);}
+  else{dmAns++;if(correct)dmOk++;updateProg('dm',dmAns,dmOk,dmData.length,ptxtId,pfillId,stxtId);}
+}
+
+function updateProg(prefix,ans,ok,total,ptxtId,pfillId,stxtId){
+  document.getElementById(ptxtId).textContent=`${ans} / ${total} answered`;
+  document.getElementById(pfillId).style.width=`${(ans/total)*100}%`;
+  document.getElementById(stxtId).textContent=`✓ ${ok} correct`;
+}
+
+// ─── SEARCH ────────────────────────────────────────────────────────────────
+function filterCards(val,listId){
+  const q=val.toLowerCase();
+  document.querySelectorAll(`#${listId} .mc-card`).forEach(c=>{
+    c.style.display=c.textContent.toLowerCase().includes(q)?'':'none';
+  });
+}
+
+// ─── TAB SWITCH ────────────────────────────────────────────────────────────
+function showTab(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  if(btn)btn.classList.add('active');
+}
+
+// ─── QUIZ DATA ─────────────────────────────────────────────────────────────
+const qzAll=[
+  {cat:"Speed Limits",q:"Default speed limit in an Ontario urban area (no sign)?",o:["60 km/h","80 km/h","50 km/h","40 km/h"],a:2,ex:"50 km/h is the default in cities and towns without posted signs."},
+  {cat:"Speed Limits",q:"Maximum speed on a 400-series highway (no sign)?",o:["80 km/h","90 km/h","110 km/h","100 km/h"],a:3,ex:"100 km/h is the default maximum on 400-series highways."},
+  {cat:"Demerit Points",q:"Demerit points for failing to remain at a collision scene?",o:["4 pts","6 pts","7 pts","5 pts"],a:2,ex:"Failing to remain (hit and run) = 7 demerit points — the highest HTA penalty."},
+  {cat:"Demerit Points",q:"Demerit points for careless driving?",o:["3","4","6","7"],a:2,ex:"Careless driving = 6 demerit points."},
+  {cat:"Demerit Points",q:"Demerit points for failing to stop for a school bus?",o:["3","4","5","6"],a:3,ex:"Failing to stop for a school bus = 6 demerit points + minimum $400 fine."},
+  {cat:"Demerit Points",q:"Demerit points for speeding 30–49 km/h over?",o:["2","3","4","6"],a:2,ex:"Speeding 30–49 km/h over = 4 demerit points + $7/km fine."},
+  {cat:"Demerit Points",q:"Demerit points for a FIRST distracted driving offence?",o:["2","3","4","6"],a:1,ex:"First distracted driving offence = 3 demerit points + $615–$1,000 fine."},
+  {cat:"Demerit Points",q:"Demerit points for speeding 16–29 km/h over?",o:["2","3","4","6"],a:1,ex:"Speeding 16–29 km/h over = 3 demerit points + $4.50/km fine."},
+  {cat:"Demerit Points",q:"Demerit points for improper use of an HOV lane?",o:["1","2","3","4"],a:1,ex:"Improper HOV lane use = 2 demerit points."},
+  {cat:"Licence Suspension",q:"At how many points is a fully licensed driver's licence suspended?",o:["9","12","15","10"],a:2,ex:"Fully licensed drivers are suspended for 30 days at 15+ demerit points."},
+  {cat:"Licence Suspension",q:"At how many points is a novice (G1/G2) driver's licence suspended?",o:["6","8","9","12"],a:2,ex:"Novice drivers face a 60-day suspension at 9+ demerit points."},
+  {cat:"Licence Suspension",q:"How long do demerit points stay on your Ontario record?",o:["1 year","2 years","3 years","5 years"],a:1,ex:"Demerit points remain on record for 2 years from the offence date."},
+  {cat:"Alcohol & BAC",q:"BAC limit for G1 and G2 drivers?",o:["0.05%","0.08%","0.00%","0.03%"],a:2,ex:"Zero tolerance — G1, G2, M1, M2 and all drivers under 22 must have 0.00% BAC."},
+  {cat:"Alcohol & BAC",q:"'Warn range' BAC that triggers roadside suspension for full-G drivers?",o:["0.03%","0.05%","0.08%","0.10%"],a:1,ex:"0.05–0.079% is the warn range: 3-day suspension (1st), 7-day (2nd), 30-day (3rd+)."},
+  {cat:"School Bus",q:"How far must you stop from a school bus with flashing red lights?",o:["10 m","15 m","20 m","30 m"],a:2,ex:"Stop at least 20 metres away from a school bus with upper red lights flashing."},
+  {cat:"Right of Way",q:"Two vehicles arrive at a four-way stop simultaneously. Who goes first?",o:["Driver going straight","Driver on the left","Driver on the right","Larger vehicle"],a:2,ex:"At simultaneous arrivals, yield to the driver on your right."},
+  {cat:"Road Rules",q:"Is a U-turn permitted on a 400-series highway?",o:["Yes, at median openings","Yes if safe","No — prohibited","Only for emergencies"],a:2,ex:"U-turns are illegal on all controlled-access highways including 400-series."},
+  {cat:"Fines",q:"Minimum fine for driving without insurance?",o:["$1,000","$2,500","$5,000","$500"],a:2,ex:"Driving without insurance: minimum $5,000 fine (up to $50,000). Zero demerit points."},
+  {cat:"Fines",q:"Does a speed camera ticket add demerit points?",o:["Yes, 3 points","Yes, 2 points","No — fines only","Yes, 1 point"],a:2,ex:"Speed camera tickets are fines only — no demerit points, since the camera cannot identify the driver."},
+  {cat:"G1 Restrictions",q:"Can a G1 driver use a hands-free Bluetooth device while driving?",o:["Yes, hands-free is allowed","No — all devices prohibited","Only on local roads","Only with supervisor permission"],a:1,ex:"G1 (and G2) drivers cannot use ANY device — hand-held OR hands-free — while driving."},
+  {cat:"G1 Restrictions",q:"G1 curfew — when can't they drive?",o:["11 PM – 5 AM","Midnight – 6 AM","Midnight – 5 AM","10 PM – 6 AM"],a:2,ex:"G1 drivers cannot drive between midnight and 5 AM."},
+  {cat:"Seat Belts",q:"Who is charged if a passenger under 16 is not belted?",o:["The passenger","The driver","Both equally","The vehicle owner"],a:1,ex:"The driver is responsible — 2 demerit points per unbelted passenger under 16."},
+  {cat:"Demerit Points",q:"Demerit points for following too closely (tailgating)?",o:["2","3","4","6"],a:2,ex:"Following too closely = 4 demerit points."},
+  {cat:"Fines",q:"Fine rate for speeding 30–49 km/h over the limit?",o:["$3/km","$4.50/km","$7/km","$9.75/km"],a:2,ex:"Speeding 30–49 km/h over = $7 per km over the limit + 4 demerit points."},
+  {cat:"Demerit Points",q:"Demerit points for speeding 50+ km/h over the limit?",o:["4","5","6","7"],a:2,ex:"Speeding 50+ km/h over = 6 demerit points + $9.75/km + possible stunt driving charges."},
+  {cat:"Fines",q:"Fine rate for speeding 1–15 km/h over the limit?",o:["$2/km","$3/km (0 pts)","$4.50/km","Flat $100"],a:1,ex:"Speeding 1–15 km/h over = $3 per km over. No demerit points in this range."},
+  {cat:"Demerit Points",q:"Demerit points for failing to obey a stop sign or traffic light?",o:["2","3","4","6"],a:1,ex:"Failing to obey a stop sign, traffic light, or railway signal = 3 demerit points."},
+  {cat:"Weather",q:"When are headlights legally required?",o:["Only at night","Only in rain","30 min after sunset to 30 min before sunrise, and visibility under 150 m","Only in tunnels"],a:2,ex:"Headlights required from 30 min after sunset to 30 min before sunrise, and when visibility drops below 150 m."},
+  {cat:"Demerit Points",q:"Demerit points for stunt driving?",o:["3","4","6","7"],a:2,ex:"Racing and stunt driving = 6 demerit points."},
+  {cat:"Fines",q:"Demerit point interview fee?",o:["Free","$25","$50","$100"],a:2,ex:"The mandatory demerit point interview fee is $50, paid at any ServiceOntario centre."},
+];
+
+// ─── QUIZ LOGIC ────────────────────────────────────────────────────────────
+let curQuiz=[],curIdx=0,qzScr=0,qzDone=false;
+
+function startQuiz(type){
+  let pool=[...qzAll];
+  if(type==='dm') pool=pool.filter(q=>['Demerit Points','Fines','Licence Suspension','Alcohol & BAC'].includes(q.cat));
+  if(type==='rules') pool=pool.filter(q=>!['Demerit Points','Fines','Licence Suspension','Alcohol & BAC'].includes(q.cat));
+  pool.sort(()=>Math.random()-.5);
+  const n=type==='dm'?15:20;
+  curQuiz=pool.slice(0,Math.min(n,pool.length));
+  curIdx=0;qzScr=0;
+  document.getElementById('qzSetup').style.display='none';
+  document.getElementById('qzCont').style.display='block';
+  document.getElementById('qzResult').style.display='none';
+  drawQ();
+}
+
+function drawQ(){
+  const q=curQuiz[curIdx]; const total=curQuiz.length;
+  qzDone=false;
+  document.getElementById('qzNum').textContent=`Q ${curIdx+1}/${total}`;
+  document.getElementById('qzScore').textContent=`Score: ${qzScr}`;
+  document.getElementById('qzFill').style.width=`${(curIdx/total)*100}%`;
+  document.getElementById('qzCat').textContent=q.cat;
+  document.getElementById('qzQ').textContent=q.q;
+  const opts=document.getElementById('qzOpts');
+  opts.innerHTML='';
+  q.o.forEach((opt,i)=>{
+    const btn=document.createElement('button');
+    btn.className='qz-opt';
+    btn.innerHTML=`<span class="qz-oltr">${L[i]}</span>${opt}`;
+    btn.onclick=()=>pickQ(i);
+    opts.appendChild(btn);
+  });
+  const fb=document.getElementById('qzFb');
+  fb.className='qz-fb'; fb.textContent='';
+  document.getElementById('qzNext').className='qz-next';
+}
+
+function pickQ(sel){
+  if(qzDone)return;
+  qzDone=true;
+  const q=curQuiz[curIdx];
+  const btns=document.querySelectorAll('.qz-opt');
+  btns.forEach(b=>b.disabled=true);
+  btns[q.a].classList.add('cor');
+  const fb=document.getElementById('qzFb');
+  if(sel===q.a){
+    qzScr++;
+    document.getElementById('qzScore').textContent=`Score: ${qzScr}`;
+    fb.className='qz-fb show cor-fb';
+    fb.textContent='✓ Correct! '+q.ex;
+    btns[sel].classList.add('cor');
+  } else {
+    btns[sel].classList.add('wrg');
+    fb.className='qz-fb show wrg-fb';
+    fb.textContent='✗ Incorrect. '+q.ex;
+  }
+  document.getElementById('qzNext').className='qz-next show';
+}
+
+function nextQ(){
+  curIdx++;
+  if(curIdx>=curQuiz.length) showResult();
+  else drawQ();
+}
+
+function showResult(){
+  document.getElementById('qzCont').style.display='none';
+  document.getElementById('qzResult').style.display='block';
+  const total=curQuiz.length, pct=Math.round((qzScr/total)*100), pass=pct>=80;
+  document.getElementById('qzBig').textContent=`${qzScr}/${total}`;
+  document.getElementById('qzBig').style.color=pass?'#4CAF50':'#C8102E';
+  document.getElementById('qzMsg').innerHTML=pass
+    ?`<div class="pass-c" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700">🎉 PASSED — ${pct}%</div>`
+    :`<div class="fail-c" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700">📚 ${pct}% — Study More</div>`;
+  document.getElementById('qzSub').textContent=pass
+    ?`You scored ${pct}% — above the 80% passing threshold. You're G1-ready!`
+    :`You need 80% (${Math.ceil(total*.8)}/${total}) to pass. Review the Memory System tab and try again.`;
+}
+
+function resetQuiz(){
+  document.getElementById('qzSetup').style.display='block';
+  document.getElementById('qzCont').style.display='none';
+  document.getElementById('qzResult').style.display='none';
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded',()=>{
+  render(qaData,'qa-list','qa','qa-ptxt','qa-pfill','qa-stxt');
+  render(dmData,'dm-list','dm','dm-ptxt','dm-pfill','dm-stxt');
+});
+</script>
+</body>
+</html>
